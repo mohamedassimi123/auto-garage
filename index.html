@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>معرض سيارات للبيع - 20 سيارة</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .title {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 40px;
+      font-size: 28px;
+    }
+
+    .car-card {
+      background-color: #fff;
+      border-radius: 16px;
+      padding: 20px 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: 30px auto;
+      direction: rtl;
+    }
+
+    .car-card h2 {
+      color: #2980b9;
+      margin-top: 0;
+    }
+
+    .promo {
+      color: #e74c3c;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .car-info {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 20px;
+    }
+
+    .car-info li {
+      padding: 5px 0;
+    }
+
+    .slider {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .slide.active {
+      display: block;
+    }
+
+    .zoom-btn {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: none;
+      font-size: 20px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 18px;
+      z-index: 2;
+      border-radius: 50%;
+    }
+
+    .slider-btn.prev { left: 10px; }
+    .slider-btn.next { right: 10px; }
+
+    .dots {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin: 4px;
+      background-color: #bbb;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .dot.active {
+      background-color: #333;
+    }
+
+    /* Popup */
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      flex-direction: column;
+    }
+
+    .popup-image-container {
+      position: relative;
+    }
+
+    .popup-overlay img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #000;
+    }
+
+    .popup-overlay .close-btn {
+      position: absolute;
+      top: -40px;
+      right: -10px;
+      font-size: 30px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .popup-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 40px;
+      color: white;
+      background: rgba(0, 0, 0, 0.4);
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 50%;
+    }
+
+    .popup-nav.prev { left: -60px; }
+    .popup-nav.next { right: -60px; }
+
+    @media (max-width: 600px) {
+      .popup-nav.prev { left: 10px; }
+      .popup-nav.next { right: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<h1 class="title">🚘 معرض سيارات للبيع - 20 سيارة</h1>
+
+<!-- بطاقة سيارات مكررة -->
+<div id="cars-container">
+
+  <!-- مثال بطاقة سيارة (كررها وغيّر البيانات) -->
+  <div class="car-card" data-car-id="1">
+    <h2>مرسيدس C-Class 2020</h2>
+    <p class="promo">📣 فرصة لا تعوّض! سيارة نظيفة بأداء ممتاز وسعر مناسب.</p>
+    <ul class="car-info">
+      <li>الوقود: ديزل</li>
+      <li>الكيلومترات: 90,000 كم</li>
+      <li>اللون: أسود ميتاليك</li>
+      <li>الثمن: 150,000 درهم</li>
+    </ul>
+    <div class="slider" data-car="1">
+      <div class="slide-container">
+        <img src="m1.jpg" class="slide active" alt="صورة 1">
+        <button class="zoom-btn" onclick="openPopup(1,0)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="m2.jpg" class="slide" alt="صورة 2">
+        <button class="zoom-btn" onclick="openPopup(1,1)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="m3.jpg" class="slide" alt="صورة 3">
+        <button class="zoom-btn" onclick="openPopup(1,2)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="m4.jpg" class="slide" alt="صورة 4">
+        <button class="zoom-btn" onclick="openPopup(1,3)">🔍</button>
+      </div>
+      <button class="slider-btn prev" onclick="prevSlide(1)">❮</button>
+      <button class="slider-btn next" onclick="nextSlide(1)">❯</button>
+      <div class="dots">
+        <span class="dot active" onclick="setSlide(1,0)"></span>
+        <span class="dot" onclick="setSlide(1,1)"></span>
+        <span class="dot" onclick="setSlide(1,2)"></span>
+        <span class="dot" onclick="setSlide(1,3)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- كرر هنا 19 بطاقة أخرى مع تغيير data-car-id والأسماء والصور والمعلومات -->
+
+  <!-- سأضع مثالين إضافيين فقط لتوضيح، باقيك تكرر بنفس الطريقة -->
+  <div class="car-card" data-car-id="2">
+    <h2>بي إم دبليو X5 2021</h2>
+    <p class="promo">🚀 أداء قوي وفخامة لا تضاهى.</p>
+    <ul class="car-info">
+      <li>الوقود: بنزين</li>
+      <li>الكيلومترات: 40,000 كم</li>
+      <li>اللون: أزرق داكن</li>
+      <li>الثمن: 250,000 درهم</li>
+    </ul>
+    <div class="slider" data-car="2">
+      <div class="slide-container">
+        <img src="passat cc 2015 1.jpg" class="slide active" alt="صورة 1">
+        <button class="zoom-btn" onclick="openPopup(2,0)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="passat cc 2015 2.jpg" class="slide" alt="صورة 2">
+        <button class="zoom-btn" onclick="openPopup(2,1)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="passat cc 2015  3.jpg" class="slide" alt="صورة 3">
+        <button class="zoom-btn" onclick="openPopup(2,2)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="passat cc 2015  4.jpg" class="slide" alt="صورة 4">
+        <button class="zoom-btn" onclick="openPopup(2,3)">🔍</button>
+      </div>
+      <button class="slider-btn prev" onclick="prevSlide(2)">❮</button>
+      <button class="slider-btn next" onclick="nextSlide(2)">❯</button>
+      <div class="dots">
+        <span class="dot active" onclick="setSlide(2,0)"></span>
+        <span class="dot" onclick="setSlide(2,1)"></span>
+        <span class="dot" onclick="setSlide(2,2)"></span>
+        <span class="dot" onclick="setSlide(2,3)"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="car-card" data-car-id="3">
+    <h2>كيا سبورتاج 2019</h2>
+    <p class="promo">💡 اقتصادية وعملية مع تصميم عصري.</p>
+    <ul class="car-info">
+      <li>الوقود: بنزين</li>
+      <li>الكيلومترات: 70,000 كم</li>
+      <li>اللون: أحمر</li>
+      <li>الثمن: 95,000 درهم</li>
+    </ul>
+    <div class="slider" data-car="3">
+      <div class="slide-container">
+        <img src="volkswagen t-roc 1.jpg" class="slide active" alt="صورة 1">
+        <button class="zoom-btn" onclick="openPopup(3,0)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="volkswagen t-roc 2.jpg" class="slide" alt="صورة 2">
+        <button class="zoom-btn" onclick="openPopup(3,1)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="volkswagen t-roc 3.jpg" class="slide" alt="صورة 3">
+        <button class="zoom-btn" onclick="openPopup(3,2)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="volkswagen t-roc 4.jpg" class="slide" alt="صورة 4">
+        <button class="zoom-btn" onclick="openPopup(3,3)">🔍</button>
+      </div>
+      <button class="slider-btn prev" onclick="prevSlide(3)">❮</button>
+      <button class="slider-btn next" onclick="nextSlide(3)">❯</button>
+      <div class="dots">
+        <span class="dot active" onclick="setSlide(3,0)"></span>
+        <span class="dot" onclick="setSlide(3,1)"></span>
+        <span class="dot" onclick="setSlide(3,2)"></span>
+        <span class="dot" onclick="setSlide(3,3)"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="car-card" data-car-id="4">
+    <h2>مرسيدس GLA 2022</h2>
+    <p class="promo">🔥 سيارة عصرية بمواصفات فاخرة وسعر لا يُفوت.</p>
+    <ul class="car-info">
+      <li>الوقود: ديزل</li>
+      <li>الكيلومترات: 60,000 كم</li>
+      <li>اللون: رمادي فضي</li>
+      <li>الثمن: 180,000 درهم</li>
+    </ul>
+    <div class="slider" data-car="4">
+      <div class="slide-container">
+        <img src="Renault Expriss 2023 1.jpg" class="slide active" alt="صورة 1">
+        <button class="zoom-btn" onclick="openPopup(4,0)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="Renault Expriss 2023 2.jpg" class="slide" alt="صورة 2">
+        <button class="zoom-btn" onclick="openPopup(4,1)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="Renault Expriss 2023 3.jpg" class="slide" alt="صورة 3">
+        <button class="zoom-btn" onclick="openPopup(4,2)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="Renault Expriss 2023 4.jpg" class="slide" alt="صورة 4">
+        <button class="zoom-btn" onclick="openPopup(4,3)">🔍</button>
+      </div>
+      <button class="slider-btn prev" onclick="prevSlide(4)">❮</button>
+      <button class="slider-btn next" onclick="nextSlide(4)">❯</button>
+      <div class="dots">
+        <span class="dot active" onclick="setSlide(4,0)"></span>
+        <span class="dot" onclick="setSlide(4,1)"></span>
+        <span class="dot" onclick="setSlide(4,2)"></span>
+        <span class="dot" onclick="setSlide(4,3)"></span>
+      </div>
+    </div>
+  </div>
+  <div class="car-card" data-car-id="5">
+    <h2>مرسيدس GLA 2022</h2>
+    <p class="promo">🔥 سيارة عصرية بمواصفات فاخرة وسعر لا يُفوت.</p>
+    <ul class="car-info">
+      <li>الوقود: ديزل</li>
+      <li>الكيلومترات: 60,000 كم</li>
+      <li>اللون: رمادي فضي</li>
+      <li>الثمن: 180,000 درهم</li>
+    </ul>
+    <div class="slider" data-car="5">
+      <div class="slide-container">
+        <img src="seat ateca fr 1.jpg" class="slide active" alt="صورة 1">
+        <button class="zoom-btn" onclick="openPopup(5,0)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="seat ateca fr 2.jpg" class="slide" alt="صورة 2">
+        <button class="zoom-btn" onclick="openPopup(,1)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="seat ateca fr 3.jpg" class="slide" alt="صورة 3">
+        <button class="zoom-btn" onclick="openPopup(5,2)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="seat ateca fr 4.jpg" class="slide" alt="صورة 4">
+        <button class="zoom-btn" onclick="openPopup(5,3)">🔍</button>
+      </div>
+      <button class="slider-btn prev" onclick="prevSlide(5)">❮</button>
+      <button class="slider-btn next" onclick="nextSlide(5)">❯</button>
+      <div class="dots">
+        <span class="dot active" onclick="setSlide(4,0)"></span>
+        <span class="dot" onclick="setSlide(5,1)"></span>
+        <span class="dot" onclick="setSlide(5,2)"></span>
+        <span class="dot" onclick="setSlide(5,3)"></span>
+      </div>
+    </div>
+  </div>
+  <div class="car-card" data-car-id="6">
+    <h2>مرسيدس GLA 2022</h2>
+    <p class="promo">🔥 سيارة عصرية بمواصفات فاخرة وسعر لا يُفوت.</p>
+    <ul class="car-info">
+      <li>الوقود: ديزل</li>
+      <li>الكيلومترات: 60,000 كم</li>
+      <li>اللون: رمادي فضي</li>
+      <li>الثمن: 180,000 درهم</li>
+    </ul>
+    <div class="slider" data-car="6">
+      <div class="slide-container">
+        <img src="Renault clio5 1.jpg" class="slide active" alt="صورة 1">
+        <button class="zoom-btn" onclick="openPopup(6,0)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="Renault clio5 2.jpg" class="slide" alt="صورة 2">
+        <button class="zoom-btn" onclick="openPopup(6,1)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="Renault clio5 3.jpg" class="slide" alt="صورة 3">
+        <button class="zoom-btn" onclick="openPopup(6,2)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="Renault clio5 4.jpg" class="slide" alt="صورة 4">
+        <button class="zoom-btn" onclick="openPopup(6,3)">🔍</button>
+      </div>
+      <button class="slider-btn prev" onclick="prevSlide(6)">❮</button>
+      <button class="slider-btn next" onclick="nextSlide(6)">❯</button>
+      <div class="dots">
+        <span class="dot active" onclick="setSlide(4,0)"></span>
+        <span class="dot" onclick="setSlide(6,1)"></span>
+        <span class="dot" onclick="setSlide(6,2)"></span>
+        <span class="dot" onclick="setSlide(6,3)"></span>
+      </div>
+    </div>
+  </div>
+  <div class="car-card" data-car-id="7">
+    <h2>مرسيدس GLA 2022</h2>
+    <p class="promo">🔥 سيارة عصرية بمواصفات فاخرة وسعر لا يُفوت.</p>
+    <ul class="car-info">
+      <li>الوقود: ديزل</li>
+      <li>الكيلومترات: 60,000 كم</li>
+      <li>اللون: رمادي فضي</li>
+      <li>الثمن: 180,000 درهم</li>
+    </ul>
+    <div class="slider" data-car="7">
+      <div class="slide-container">
+        <img src="PEUGEOT 2021(208) 1.jpg" class="slide active" alt="صورة 1">
+        <button class="zoom-btn" onclick="openPopup(7,0)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="PEUGEOT 2021(208) 2.jpg" class="slide" alt="صورة 2">
+        <button class="zoom-btn" onclick="openPopup(7,1)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="PEUGEOT 2021(208) 3.jpg" class="slide" alt="صورة 3">
+        <button class="zoom-btn" onclick="openPopup(7,2)">🔍</button>
+      </div>
+      <div class="slide-container">
+        <img src="PEUGEOT 2021(208) 4.jpg" class="slide" alt="صورة 4">
+        <button class="zoom-btn" onclick="openPopup(7,3)">🔍</button>
+      </div>
+      <button class="slider-btn prev" onclick="prevSlide(7)">❮</button>
+      <button class="slider-btn next" onclick="nextSlide(7)">❯</button>
+      <div class="dots">
+        <span class="dot active" onclick="setSlide(4,0)"></span>
+        <span class="dot" onclick="setSlide(7,1)"></span>
+        <span class="dot" onclick="setSlide(7,2)"></span>
+        <span class="dot" onclick="setSlide(7,3)"></span>
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  <!-- كرر نفس الطريقة لباقي السيارات (4 حتى 20) -->
+</div>
+
+<!-- Popup Zoom Viewer -->
+<div class="popup-overlay" id="popup">
+  <div class="popup-image-container">
+    <span class="close-btn" onclick="closePopup()">✖</span>
+    <button class="popup-nav prev" onclick="navigatePopup(-1)">❮</button>
+    <img id="popupImage" src="" alt="تكبير الصورة">
+    <button class="popup-nav next" onclick="navigatePopup(1)">❯</button>
+  </div>
+</div>
+
+<script>
+  const slideIndices = {};
+  let popupImages = [];
+  let currentPopupCar = null;
+  let currentPopupIndex = 0;
+
+  function showSlide(carId, index) {
+    const slider = document.querySelector(`.slider[data-car="${carId}"]`);
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.slide');
+    const dots = slider.querySelectorAll(`.slider[data-car="${carId}"] .dot`);
+    slideIndices[carId] = index;
+
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === index);
+    });
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+  }
+
+  function nextSlide(carId) {
+    const slider = document.querySelector(`.slider[data-car="${carId}"]`);
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.slide');
+    const currentIndex = slideIndices[carId] ?? 0;
+    const nextIndex = (currentIndex + 1) % slides.length;
+    showSlide(carId, nextIndex);
+  }
+
+  function prevSlide(carId) {
+    const slider = document.querySelector(`.slider[data-car="${carId}"]`);
+    if (!slider) return;
+
+    const slides = slider.querySelectorAll('.slide');
+    const currentIndex = slideIndices[carId] ?? 0;
+    const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+    showSlide(carId, prevIndex);
+  }
+
+  function setSlide(carId, index) {
+    showSlide(carId, index);
+  }
+
+  function openPopup(carId, index) {
+    const slider = document.querySelector(`.slider[data-car="${carId}"]`);
+    if (!slider) return;
+
+    popupImages = Array.from(slider.querySelectorAll('.slide'));
+    currentPopupCar = carId;
+    currentPopupIndex = index;
+
+    document.getElementById('popupImage').src = popupImages[index].src;
+    document.getElementById('popup').style.display = 'flex';
+  }
+
+  function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
+
+  function navigatePopup(direction) {
+    if (!currentPopupCar) return;
+
+    const slider = document.querySelector(`.slider[data-car="${currentPopupCar}"]`);
+    if (!slider) return;
+
+    popupImages = Array.from(slider.querySelectorAll('.slide'));
+    currentPopupIndex = (currentPopupIndex + direction + popupImages.length) % popupImages.length;
+
+    document.getElementById('popupImage').src = popupImages[currentPopupIndex].src;
+  }
+
+  // تهيئة كل السلايدرز عند تحميل الصفحة
+  document.addEventListener('DOMContentLoaded', () => {
+    for(let i=1; i<=20; i++) {
+      showSlide(i, 0);
+    }
+  });
+
+  // إغلاق البوب أب عند الضغط بالخارج
+  document.getElementById('popup').addEventListener('click', (e) => {
+    if(e.target.id === 'popup') {
+      closePopup();
+    }
+  });
+</script>
+
+</body>
+</html>
